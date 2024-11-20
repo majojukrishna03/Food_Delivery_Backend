@@ -1,8 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const userRoutes = require('./routes/userRoutes');
 require('dotenv').config();
+
+// Import routes
+const userRoutes = require('./routes/userRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 
@@ -24,7 +27,7 @@ const connectDB = async () => {
   }
 };
 
-// Define a basic route
+// Basic route
 app.get('/', async (req, res) => {
   try {
     res.send('Welcome to Inti Bhojanam Backend!');
@@ -34,7 +37,8 @@ app.get('/', async (req, res) => {
 });
 
 // Use routes
-app.use('/api/users', userRoutes);
+app.use('/api/users', userRoutes); // User-related routes
+app.use('/api/users/auth', authRoutes);  // Authentication routes
 
 // Graceful Shutdown
 process.on('SIGINT', async () => {
