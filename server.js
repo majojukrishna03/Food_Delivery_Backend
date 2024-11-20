@@ -6,6 +6,7 @@ require('dotenv').config();
 // Import routes
 const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes');
+const restaurantRoutes = require('./routes/restaurantRoutes');
 
 const app = express();
 
@@ -16,10 +17,7 @@ app.use(express.json());
 // MongoDB Connection
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(process.env.MONGO_URI);
     console.log('MongoDB connected successfully');
   } catch (err) {
     console.error('MongoDB connection error:', err.message);
@@ -39,6 +37,7 @@ app.get('/', async (req, res) => {
 // Use routes
 app.use('/api/users', userRoutes); // User-related routes
 app.use('/api/users/auth', authRoutes);  // Authentication routes
+app.use('/api/restaurants',restaurantRoutes) // Restaurant routes
 
 // Graceful Shutdown
 process.on('SIGINT', async () => {
@@ -58,6 +57,6 @@ process.on('SIGTERM', async () => {
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, async () => {
-  await connectDB();
   console.log(`Server running on port ${PORT}`);
+  await connectDB();
 });
