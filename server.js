@@ -8,6 +8,7 @@ const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes');
 const restaurantRoutes = require('./routes/restaurantRoutes');
 const menuItemRoutes = require('./routes/menuItemRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.use('/api/users', userRoutes); // User-related routes
 app.use('/api/users/auth', authRoutes);  // Authentication routes
 app.use('/api/restaurants',restaurantRoutes) // Restaurant routes
 app.use('/api/menu-items',menuItemRoutes)  // Menu item routes
+app.use('/api/orders',orderRoutes)  // Order routes
 
 // Graceful Shutdown
 process.on('SIGINT', async () => {
