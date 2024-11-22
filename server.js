@@ -7,6 +7,7 @@ require('dotenv').config();
 const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes');
 const restaurantRoutes = require('./routes/restaurantRoutes');
+const menuItemRoutes = require('./routes/menuItemRoutes');
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.get('/', async (req, res) => {
 app.use('/api/users', userRoutes); // User-related routes
 app.use('/api/users/auth', authRoutes);  // Authentication routes
 app.use('/api/restaurants',restaurantRoutes) // Restaurant routes
+app.use('/api/menu-items',menuItemRoutes)  // Menu item routes
 
 // Graceful Shutdown
 process.on('SIGINT', async () => {
