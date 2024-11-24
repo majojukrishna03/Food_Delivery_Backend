@@ -8,6 +8,7 @@ const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes');
 const restaurantRoutes = require('./routes/restaurantRoutes');
 const menuItemRoutes = require('./routes/menuItemRoutes');
+const cartRoutes = require('./routes/cartRoutes')
 const orderRoutes = require('./routes/orderRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 
@@ -42,6 +43,7 @@ app.use('/api/users', userRoutes); // User routes
 app.use('/api/users/auth', authRoutes);  // Authentication routes
 app.use('/api/restaurants',restaurantRoutes) // Restaurant routes
 app.use('/api/menu-items',menuItemRoutes)  // Menu item routes
+app.use('/api/cart',cartRoutes)  // Cart routes
 app.use('/api/orders',orderRoutes)  // Order routes
 app.use('/api/payments',paymentRoutes) // Payment routes
 

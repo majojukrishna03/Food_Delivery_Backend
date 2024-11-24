@@ -1,7 +1,8 @@
 const Order = require('../models/orderModel'); 
-const MenuItem = require('../models/menuItemModel'); 
+const MenuItem = require('../models/menuItemModel');
+const Cart = require('../models/cartModel'); 
 
-// Create a new order
+// Create a new order and delete the cart
 exports.createOrder = async (req, res) => {
   try {
     const { userId, restaurantId, items } = req.body;
@@ -35,8 +36,12 @@ exports.createOrder = async (req, res) => {
     });
 
     const savedOrder = await newOrder.save();
+
+    // Delete the user's cart after placing the order
+    await Cart.findOneAndDelete({ userId }); // Remove the entire cart document
+
     res.status(201).json({
-      message: 'Order created successfully',
+      message: 'Order created and cart cleared successfully',
       order: savedOrder,
     });
   } catch (err) {
@@ -82,48 +87,48 @@ exports.getOrdersByUserId = async (req, res) => {
   }
 };
 
-// Get all orders by a specific restaurant
-exports.getOrdersByRestaurantId = async (req, res) => {
-  try {
-    const restaurantOrders = await Order.find({ restaurantId: req.params.restaurantId })
-      .populate('userId', 'name email') // Populate user details
-      .populate('items.menuItemId', 'name price'); // Populate menu item details
+// // Get all orders by a specific restaurant
+// exports.getOrdersByRestaurantId = async (req, res) => {
+//   try {
+//     const restaurantOrders = await Order.find({ restaurantId: req.params.restaurantId })
+//       .populate('userId', 'name email') // Populate user details
+//       .populate('items.menuItemId', 'name price'); // Populate menu item details
 
-    if (restaurantOrders.length === 0) {
-      return res.status(404).json({ message: 'No orders found for this restaurant' });
-    }
+//     if (restaurantOrders.length === 0) {
+//       return res.status(404).json({ message: 'No orders found for this restaurant' });
+//     }
 
-    res.status(200).json(restaurantOrders);
-  } catch (err) {
-    console.error('Error fetching orders by restaurant:', err);
-    res.status(500).json({ message: 'Error fetching orders by restaurant', error: err.message });
-  }
-};
+//     res.status(200).json(restaurantOrders);
+//   } catch (err) {
+//     console.error('Error fetching orders by restaurant:', err);
+//     res.status(500).json({ message: 'Error fetching orders by restaurant', error: err.message });
+//   }
+// };
 
-// Update the status of an order
-exports.updateOrderStatus = async (req, res) => {
-  try {
-    const { status } = req.body;
+// // Update the status of an order
+// exports.updateOrderStatus = async (req, res) => {
+//   try {
+//     const { status } = req.body;
 
-    const updatedOrder = await Order.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true, runValidators: true }
-    );
+//     const updatedOrder = await Order.findByIdAndUpdate(
+//       req.params.id,
+//       { status },
+//       { new: true, runValidators: true }
+//     );
 
-    if (!updatedOrder) {
-      return res.status(404).json({ message: 'Order not found' });
-    }
+//     if (!updatedOrder) {
+//       return res.status(404).json({ message: 'Order not found' });
+//     }
 
-    res.status(200).json({
-      message: 'Order status updated successfully',
-      order: updatedOrder,
-    });
-  } catch (err) {
-    console.error('Error updating order status:', err);
-    res.status(500).json({ message: 'Error updating order status', error: err.message });
-  }
-};
+//     res.status(200).json({
+//       message: 'Order status updated successfully',
+//       order: updatedOrder,
+//     });
+//   } catch (err) {
+//     console.error('Error updating order status:', err);
+//     res.status(500).json({ message: 'Error updating order status', error: err.message });
+//   }
+// };
 
 // Delete an order by ID
 exports.deleteOrder = async (req, res) => {
