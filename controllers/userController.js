@@ -126,3 +126,15 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ message: 'Error deleting user', error: err.message });
   }
 };
+
+exports.getAdminCount = async (req, res) => {
+  try {
+    // Correctly filter users by role, not by _id
+    const adminCount = await User.countDocuments({ role: "admin" });
+    // console.log(adminCount);
+    res.status(200).json({ count: adminCount });
+  } catch (err) {
+    console.error('Error fetching admin count:', err);
+    res.status(500).json({ message: 'Error fetching admin count', error: err.message });
+  }
+};
