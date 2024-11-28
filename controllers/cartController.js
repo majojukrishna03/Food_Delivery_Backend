@@ -3,13 +3,17 @@ const Cart = require('../models/cartModel');  // Assuming you have a Cart model
 // Add a menu item to the cart
 exports.addToCart = async (req, res) => {
   try {
-    const { userId, menuItemId, quantity } = req.body;
+    // console.log(req.body);
+    const { userId, items} = req.body;
+    const menuItemId = items[0].menuItemId;
+    const quantity = items[0].quantity;
+    // console.log("hey found ",userId,menuItemId,quantity);
 
     // Check if the cart already exists for the user
     let cart = await Cart.findOne({ userId });
 
     if (!cart) {
-      // If cart doesn't exist, create a new one
+      // If cart doesn't exist, create a new one  
       cart = new Cart({
         userId,
         items: [
@@ -49,6 +53,56 @@ exports.addToCart = async (req, res) => {
     });
   }
 };
+
+// Update an existing cart
+exports.updateCart = async (req, res) => {
+  try {
+    const { cartId } = req.body; // Extract cartId from the URL
+    const { userId, items } = req.body; // Extract userId and updated items from the request body
+
+    // Find the cart by cartId and userId for additional validation
+    const cart = await Cart.findOne({ _id: cartId, userId });
+
+    if (!cart) {
+      return res.status(404).json({
+        message: "Cart not found for the given user.",
+      });
+    }
+
+    // Iterate through the items to update quantities or add new items
+    items.forEach((newItem) => {
+      const existingItemIndex = cart.items.findIndex(
+        (item) => item.menuItemId.toString() === newItem.menuItemId
+      );
+
+      if (existingItemIndex === -1) {
+        // Item doesn't exist in the cart, add it
+        cart.items.push({
+          menuItemId: newItem.menuItemId,
+          quantity: newItem.quantity,
+        });
+      } else {
+        // Item exists, update the quantity
+        cart.items[existingItemIndex].quantity = newItem.quantity;
+      }
+    });
+
+    // Save the updated cart
+    const updatedCart = await cart.save();
+
+    res.status(200).json({
+      message: "Cart updated successfully.",
+      cart: updatedCart,
+    });
+  } catch (err) {
+    console.error("Error updating cart:", err);
+    res.status(500).json({
+      message: "Error updating cart.",
+      error: err.message,
+    });
+  }
+};
+
 
 // Remove a menu item from the cart
 exports.removeFromCart = async (req, res) => {
