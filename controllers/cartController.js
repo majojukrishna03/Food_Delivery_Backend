@@ -57,7 +57,7 @@ exports.addToCart = async (req, res) => {
 // Update an existing cart
 exports.updateCart = async (req, res) => {
   try {
-    const { cartId } = req.body; // Extract cartId from the URL
+    const { cartId } = req.params; // Extract cartId from the URL
     const { userId, items } = req.body; // Extract userId and updated items from the request body
 
     // Find the cart by cartId and userId for additional validation
@@ -189,8 +189,12 @@ exports.getCartByUserId = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    // Find the cart by userId
-    const cart = await Cart.findOne({ userId }).populate('items.menuItemId');
+    // Find the cart by userId and populate menuItemId and its restaurantId
+    const cart = await Cart.findOne({ userId })
+      .populate({
+        path: 'items.menuItemId',
+        populate: { path: 'restaurantId', select: 'name' }, // Populate restaurantId with only the name field
+      });
 
     if (!cart) {
       return res.status(404).json({ message: 'Cart not found' });
@@ -206,13 +210,20 @@ exports.getCartByUserId = async (req, res) => {
   }
 };
 
-// Clear the cart after order placement
+
+// Clear the cart after order placement based on userId
 exports.clearCart = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const { userId } = req.params; // Expect only userId in the request body
+    // console.log(userId);
+    // console.log(req);
 
-    // Find and delete the cart for the user
-    const deletedCart = await Cart.findOneAndDelete({ userId });
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+
+    // Find and delete the cart with the specified userId
+    const deletedCart = await Cart.findOneAndDelete({ userId: userId });
 
     if (!deletedCart) {
       return res.status(404).json({ message: 'Cart not found' });
