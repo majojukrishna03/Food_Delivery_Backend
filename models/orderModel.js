@@ -11,6 +11,7 @@ const orderSchema = new mongoose.Schema({
       itemAmount: { type: Number, required: true }, // Total price for the menu item
     },
   ],
+  shippingAddress : {type:String,required: true},
   totalAmount: { type: Number, required: true }, // Total price for the entire order
   status: { type: String, enum: ['Confirmed', 'Delivered'], default: 'Confirmed' },
   createdAt: { type: Date, default: Date.now },

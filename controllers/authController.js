@@ -6,11 +6,20 @@ const User = require('../models/userModel');
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const isAdminLogin = req.originalUrl.includes('/admin/login'); // Check if it's an admin login endpoint
 
     // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Ensure the user role matches the login type
+    if (isAdminLogin && user.role !== 'admin') {
+      return res.status(403).json({ message: 'Access denied: Admin credentials required' });
+    }
+    if (!isAdminLogin && user.role === 'admin') {
+      return res.status(403).json({ message: 'Access denied: User credentials required' });
     }
 
     // Compare passwords
@@ -21,7 +30,7 @@ exports.loginUser = async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user._id, role: user.role ,name: user.name},
+      { userId: user._id, role: user.role, name: user.name },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
@@ -41,6 +50,7 @@ exports.loginUser = async (req, res) => {
     res.status(500).json({ message: 'Error during login', error: error.message });
   }
 };
+
 
 // Logout user
 exports.logoutUser = async (req, res) => {
