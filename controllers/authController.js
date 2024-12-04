@@ -15,10 +15,10 @@ exports.loginUser = async (req, res) => {
     }
 
     // Ensure the user role matches the login type
-    if (isAdminLogin && user.role !== 'admin') {
+    if (isAdminLogin && user.role === 'user') {
       return res.status(403).json({ message: 'Access denied: Admin credentials required' });
     }
-    if (!isAdminLogin && user.role === 'admin') {
+    if (!isAdminLogin && user.role !== 'user') {
       return res.status(403).json({ message: 'Access denied: User credentials required' });
     }
 
