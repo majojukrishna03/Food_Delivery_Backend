@@ -1,4 +1,5 @@
 const Restaurant = require('../models/restaurantModel');  
+const Menu = require('../models/menuItemModel')
 
 // Create a new restaurant
 exports.createRestaurant = async (req, res) => {
@@ -90,16 +91,23 @@ exports.updateRestaurant = async (req, res) => {
   }
 };
 
-// Delete a restaurant by ID
+// Delete a restaurant by ID and also delete its associated menu items
 exports.deleteRestaurant = async (req, res) => {
   try {
-    const deletedRestaurant = await Restaurant.findByIdAndDelete(req.params.id);
+    const restaurantId = req.params.id;
+
+    // Delete associated menu items first
+    await Menu.deleteMany({ restaurantId: restaurantId });
+
+    // Delete the restaurant
+    const deletedRestaurant = await Restaurant.findByIdAndDelete(restaurantId);
     if (!deletedRestaurant) {
       return res.status(404).json({ message: 'Restaurant not found' });
     }
-    res.status(200).json({ message: 'Restaurant deleted successfully' });
+
+    res.status(200).json({ message: 'Restaurant and its menu items deleted successfully' });
   } catch (err) {
-    console.error('Error deleting restaurant:', err);
-    res.status(500).json({ message: 'Error deleting restaurant', error: err.message });
+    console.error('Error deleting restaurant and menu items:', err);
+    res.status(500).json({ message: 'Error deleting restaurant and menu items', error: err.message });
   }
 };
