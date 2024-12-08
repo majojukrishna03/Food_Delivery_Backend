@@ -28,7 +28,7 @@ exports.createPayment = async (req, res) => {
       orderId,
       userId,
       amount,
-      paymentMethod,
+      paymentMethod : 'Card',
     });
 
     // Save the payment with the default status

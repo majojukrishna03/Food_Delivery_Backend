@@ -4,6 +4,7 @@ const router = express.Router();
 
 // Login route
 router.post('/login', loginUser);
+router.post('/admin/login',loginUser);
 
 // Logout route
 router.post('/logout', logoutUser);

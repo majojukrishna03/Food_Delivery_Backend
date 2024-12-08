@@ -5,7 +5,7 @@ const Cart = require('../models/cartModel');
 // Create a new order and delete the cart
 exports.createOrder = async (req, res) => {
   try {
-    const { userId, restaurantId, items } = req.body;
+    const { userId, restaurantId, items, shippingAddress } = req.body;
 
     let totalAmount = 0;
     const updatedItems = [];
@@ -32,13 +32,14 @@ exports.createOrder = async (req, res) => {
       userId,
       restaurantId,
       items: updatedItems,
+      shippingAddress,
       totalAmount,
     });
 
     const savedOrder = await newOrder.save();
 
     // Delete the user's cart after placing the order
-    await Cart.findOneAndDelete({ userId }); // Remove the entire cart document
+    // await Cart.findOneAndDelete({ userId }); // Remove the entire cart document
 
     res.status(201).json({
       message: 'Order created and cart cleared successfully',
@@ -86,6 +87,26 @@ exports.getOrdersByUserId = async (req, res) => {
     res.status(500).json({ message: 'Error fetching orders by user', error: err.message });
   }
 };
+
+// Get the latest order by a specific user
+exports.getLatestOrderByUserId = async (req, res) => {
+  try {
+    const latestOrder = await Order.findOne({ userId: req.params.userId })
+      .sort({ createdAt: -1 }) // Sort orders by creation date in descending order
+      .populate('restaurantId', 'name') // Populate restaurant details
+      .populate('items.menuItemId', 'name price'); // Populate menu item details
+
+    if (!latestOrder) {
+      return res.status(404).json({ message: 'No orders found for this user' });
+    }
+
+    res.status(200).json(latestOrder);
+  } catch (err) {
+    console.error('Error fetching the latest order by user:', err);
+    res.status(500).json({ message: 'Error fetching the latest order by user', error: err.message });
+  }
+};
+
 
 // // Get all orders by a specific restaurant
 // exports.getOrdersByRestaurantId = async (req, res) => {
