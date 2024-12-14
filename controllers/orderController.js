@@ -107,6 +107,18 @@ exports.getLatestOrderByUserId = async (req, res) => {
   }
 };
 
+// Controller to get all orders for admin
+exports.getAllOrders = async (req, res) => {
+  try {
+    // Fetch all orders from the database
+    const orders = await Order.find().populate('restaurantId').populate('items.menuItemId');
+    return res.status(200).json(orders);
+  } catch (err) {
+    console.error('Error fetching orders:', err);
+    return res.status(500).json({ message: 'Failed to fetch orders' });
+  }
+};
+
 
 // // Get all orders by a specific restaurant
 // exports.getOrdersByRestaurantId = async (req, res) => {
